@@ -155,7 +155,7 @@ node1.tp2> ping 1.1.1.1
 
 **📁 r1_running_config.txt**
 
-## 3. Vrai accès internet clients
+### 3. Vrai accès internet clients
 
 **🌞 Prove it**
 ```
@@ -211,4 +211,56 @@ node6> ping 1.1.1.1
 84 bytes from 1.1.1.1 icmp_seq=1 ttl=54 time=39.767 ms
 84 bytes from 1.1.1.1 icmp_seq=2 ttl=54 time=32.289 ms
 84 bytes from 1.1.1.1 icmp_seq=3 ttl=54 time=22.389 ms
+```
+
+## Part4 : Alors koa c tou ? On refé just la mem choz ke o tp1 enfet enfet ? Bah non
+
+**🌞 Préparer le DNS spoof**
+pas trooop sur de quoi mettre ici, car j'ai copier coller ce que tu mets, fin tu nous donnes la conf quoi, bah j'ai ```firewall-cmd --permanent add-```
+
+**🌞 S'assurer que c'est up & running, on en profite pour réviser un peu de shell**
+
+```
+ps -ef | grep dnsmasq | head -n 1
+dnsmasq     1503       1  0 20:27 ?        00:00:00 dnsmasq -C /tmp/dnsmasq.conf -q
+```
+
+```
+sudo ss -lnpu | grep dnsmasq
+UNCONN 0      0            0.0.0.0:53        0.0.0.0:*    users:(("dnsmasq",pid=1503,fd=4))
+UNCONN 0      0               [::]:53           [::]:*    users:(("dnsmasq",pid=1503,fd=6))
+```
+
+**🌞 Relance ton attaque DHCP spoof depuis la machine attaquante**
+```
+dhcp-option=6,10.2.1.250
+```
+6 pour indiquer dns, c'est le numéro de l'option
+
+** **
+```
+node7> dhcp
+DDORA IP 10.2.1.163/24 GW 10.2.1.254
+
+node7> show ip
+
+NAME        : node7[1]
+IP/MASK     : 10.2.1.163/24
+GATEWAY     : 10.2.1.254
+DNS         : 10.2.1.250
+DHCP SERVER : 10.2.1.250
+DHCP LEASE  : 42997, 43200/21600/37800
+MAC         : 00:50:79:66:68:03
+LPORT       : 10037
+RHOST:PORT  : 127.0.0.1:10038
+MTU:        : 1500
+
+node7> ping 1.1.1.1
+84 bytes from 1.1.1.1 icmp_seq=1 ttl=54 time=29.537 ms
+84 bytes from 1.1.1.1 icmp_seq=2 ttl=54 time=26.538 ms
+
+node7> ping efrei.fr
+efrei.fr resolved to 51.210.229.203
+84 bytes from 51.210.229.203 icmp_seq=1 ttl=48 time=29.444 ms
+84 bytes from 51.210.229.203 icmp_seq=2 ttl=48 time=25.438 ms
 ```
